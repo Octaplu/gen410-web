@@ -5,10 +5,17 @@ const BROKER  = import.meta.env.VITE_MQTT_URL  || 'wss://YOUR-CLUSTER.s1.eu.hive
 const MQUSER  = import.meta.env.VITE_MQTT_USER || ''
 const MQPASS  = import.meta.env.VITE_MQTT_PASS || ''
 
-const STATE_NAME = ['IDLE','KEY WAIT','CRANKING','RUNNING','STOPPING','STOP WAIT']
-const STATE_SUB  = ['Generator ready','Warming up','Starting engine','Engine running','Shutting down','Cooling down']
-const ARC_DEG    = [-90, 0, 60, 150, 210, 280]
-const ARC_COLOR  = ['#94a3b8','#f59e0b','#3b82f6','#10b981','#ef4444','#f97316']
+const STATE_NAME = ['IDLE','KEY WAIT','CRANKING','VERIFYING','RUNNING','STOPPING','STOP WAIT','FAULT']
+const STATE_SUB  = ['Generator ready','Warming up','Starting engine','Checking output','Engine running','Shutting down','Cooling down','Start failed — check gen']
+const ARC_DEG    = [-90, 0, 60, 90, 150, 210, 270, 320]
+const ARC_COLOR  = ['#94a3b8','#f59e0b','#3b82f6','#8b5cf6','#10b981','#ef4444','#f97316','#dc2626']
+
+const LOG_KEY    = 'gen410_events'
+const EVENT_LABEL = { start:'▶ Started', stop:'⏹ Stopped', fault:'⚠ Fault' }
+function loadEvents() { try { return JSON.parse(localStorage.getItem(LOG_KEY)) || [] } catch { return [] } }
+function saveEvents(ev) { try { localStorage.setItem(LOG_KEY, JSON.stringify(ev.slice(-500))) } catch {} }
+function fmtDur(s) { if (!s) return '—'; if (s < 60) return s+'s'; if (s < 3600) return (s/60).toFixed(1)+'m'; return (s/3600).toFixed(2)+'h' }
+function fmtTs(ts) { return new Date(ts).toLocaleString() }
 
 function fmt(ms) {
   const s = Math.floor(ms / 1000)
@@ -28,6 +35,7 @@ export default function App() {
   const [panel,    setPanel]    = useState(false)
   const [timings,  setTimings]  = useState({ keyDelay:42, crankDur:3, stopDur:5, keyOffDly:5 })
   const [saveMsg,  setSaveMsg]  = useState('')
+  const [events,   setEvents]   = useState(() => loadEvents())
   const clientRef = useRef(null)
 
   useEffect(() => {
@@ -44,7 +52,7 @@ export default function App() {
 
     c.on('connect', () => {
       setConn('connected')
-      c.subscribe(['gen410/status', 'gen410/relays'])
+      c.subscribe(['gen410/status', 'gen410/relays', 'gen410/log'])
     })
     c.on('reconnect', () => setConn('connecting'))
     c.on('disconnect', () => setConn('disconnected'))
@@ -62,6 +70,13 @@ export default function App() {
           setRelays({ r1: d.r1, r2: d.r2, r3: d.r3, r4: d.r4 })
           setManual(d.manual ?? false)
           if (d.kd)  setTimings(t => ({ ...t, keyDelay: d.kd, crankDur: d.cd, stopDur: d.sd, keyOffDly: d.kod }))
+        } else if (topic === 'gen410/log') {
+          const entry = { ...d, ts: Date.now() }
+          setEvents(prev => {
+            const next = [...prev, entry]
+            saveEvents(next)
+            return next
+          })
         }
       } catch (_) {}
     })
@@ -143,12 +158,17 @@ export default function App() {
           <div className="core">
             <div className="sn">{STATE_NAME[state] ?? '—'}</div>
             <div className="ss">{STATE_SUB[state]  ?? ''}</div>
-            <div className={`badge ${manual ? 'badge-manual' : 'badge-auto'}`}>
-              {manual ? 'MANUAL' : 'AUTO'}
+            <div className={`badge ${state === 7 ? 'badge-fault' : manual ? 'badge-manual' : 'badge-auto'}`}>
+              {state === 7 ? 'FAULT' : manual ? 'MANUAL' : 'AUTO'}
             </div>
             <button className="mode-btn" onClick={toggleMode}>
               {manual ? 'SWITCH TO AUTO' : 'MANUAL MODE'}
             </button>
+            {state === 7 && (
+              <button className="fault-reset-btn" onClick={() => pub('gen410/cmd/reset', {})}>
+                RESET FAULT
+              </button>
+            )}
           </div>
         </div>
       </main>
@@ -188,6 +208,46 @@ export default function App() {
           <div className="info-row"><span>Broker</span><code>{BROKER.replace('wss://','').split(':')[0]}</code></div>
           <div className="info-row"><span>Status</span><span className={conn === 'connected' ? 'text-emerald' : 'text-red'}>{connLabel}</span></div>
           <div className="info-row"><span>State</span><span>{STATE_NAME[state]}</span></div>
+        </section>
+
+        <section className="panel-section">
+          <h4 className="section-label">Event Log</h4>
+          {events.length === 0
+            ? <p className="no-log">No events yet</p>
+            : <>
+              <div className="log-table-wrap">
+                <table className="log-table">
+                  <thead><tr><th>Time</th><th>Event</th><th>Duration</th></tr></thead>
+                  <tbody>
+                    {[...events].reverse().slice(0, 50).map((e, i) => (
+                      <tr key={i} className={`log-row-${e.type}`}>
+                        <td>{fmtTs(e.ts)}</td>
+                        <td>{EVENT_LABEL[e.type] ?? e.type}</td>
+                        <td>{fmtDur(e.dur)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              {(() => {
+                const runs = events.filter(e => e.type === 'stop' && e.dur)
+                const totalSec = runs.reduce((a, e) => a + (e.dur || 0), 0)
+                const now = new Date()
+                const monthRuns = runs.filter(e => {
+                  const d = new Date(e.ts)
+                  return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()
+                })
+                const monthSec = monthRuns.reduce((a, e) => a + (e.dur || 0), 0)
+                return (
+                  <div className="log-summary">
+                    <div className="info-row"><span>This month</span><b>{monthRuns.length} run{monthRuns.length !== 1 ? 's' : ''} · {fmtDur(monthSec)}</b></div>
+                    <div className="info-row"><span>All time</span><b>{runs.length} run{runs.length !== 1 ? 's' : ''} · {fmtDur(totalSec)}</b></div>
+                    <button className="clear-log-btn" onClick={() => { setEvents([]); localStorage.removeItem(LOG_KEY) }}>Clear Log</button>
+                  </div>
+                )
+              })()}
+            </>
+          }
         </section>
 
         <section className="panel-section">
