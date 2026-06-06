@@ -36,7 +36,10 @@ export default function App() {
   const [timings,  setTimings]  = useState({ keyDelay:42, crankDur:3, stopDur:5, keyOffDly:5 })
   const [saveMsg,  setSaveMsg]  = useState('')
   const [events,   setEvents]   = useState(() => loadEvents())
-  const clientRef = useRef(null)
+  const [espOnline, setEspOnline] = useState(false)
+  const [darkMode,  setDarkMode]  = useState(() => localStorage.getItem('gen410_dark') === '1')
+  const lastSeenRef = useRef(0)
+  const clientRef   = useRef(null)
 
   useEffect(() => {
     setConn('connecting')
@@ -52,16 +55,21 @@ export default function App() {
 
     c.on('connect', () => {
       setConn('connected')
-      c.subscribe(['gen410/status', 'gen410/relays', 'gen410/log'])
+      c.subscribe(['gen410/status', 'gen410/relays', 'gen410/log', 'gen410/lwt'])
     })
     c.on('reconnect', () => setConn('connecting'))
     c.on('disconnect', () => setConn('disconnected'))
     c.on('error', () => setConn('disconnected'))
 
     c.on('message', (topic, payload) => {
+      if (topic === 'gen410/lwt') {
+        setEspOnline(payload.toString() === 'online')
+        return
+      }
       try {
         const d = JSON.parse(payload.toString())
         if (topic === 'gen410/status') {
+          lastSeenRef.current = Date.now()
           setState(d.state ?? 0)
           setPower(d.power ?? false)
           setElapsed(d.elapsed ?? 0)
@@ -81,7 +89,11 @@ export default function App() {
       } catch (_) {}
     })
 
-    return () => c.end(true)
+    const watchdog = setInterval(() => {
+      if (lastSeenRef.current && Date.now() - lastSeenRef.current > 6000) setEspOnline(false)
+    }, 3000)
+
+    return () => { c.end(true); clearInterval(watchdog) }
   }, [])
 
   const pub = useCallback((topic, payload) => {
@@ -102,6 +114,11 @@ export default function App() {
     setTimeout(() => setSaveMsg(''), 3000)
   }
 
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', darkMode)
+    localStorage.setItem('gen410_dark', darkMode ? '1' : '0')
+  }, [darkMode])
+
   const arcDeg   = ARC_DEG[state]   ?? -90
   const arcColor = ARC_COLOR[state] ?? '#94a3b8'
 
@@ -117,6 +134,13 @@ export default function App() {
           <span className={`dot-live ${connDot}`} />
           <span>{connLabel}</span>
         </div>
+        <div className={`esp-pill ${espOnline ? 'esp-online' : 'esp-offline'}`}>
+          <span className={`dot-live ${espOnline ? 'bg-emerald-400' : 'bg-red-400'}`} />
+          <span>ESP32 {espOnline ? 'ON' : 'OFF'}</span>
+        </div>
+        <button className="dark-btn" onClick={() => setDarkMode(d => !d)} title="Toggle dark mode">
+          {darkMode ? '☀️' : '🌙'}
+        </button>
         <button className="cog-btn" onClick={() => setPanel(p => !p)} title="Settings">⚙</button>
       </header>
 
