@@ -201,6 +201,9 @@ body {
 .chip-pwr { top: 10%;    right: 8.8%; }
 .chip-upt { bottom: 10%; left: 8.8%;  }
 .chip-ela { bottom: 10%; right: 8.8%; }
+.chip-sen { top: 10%;    left: 8.8%;  }
+.chip-sen-off { animation: pulse-chip .9s infinite; }
+@keyframes pulse-chip { 0%,100%{opacity:1} 50%{opacity:.45} }
 
 .text-emerald { color: #10b981 !important; }
 .text-red     { color: #ef4444 !important; }

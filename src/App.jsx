@@ -36,6 +36,7 @@ export default function App() {
   const [timings,  setTimings]  = useState({ keyDelay:42, crankDur:3, stopDur:5, keyOffDly:5 })
   const [saveMsg,  setSaveMsg]  = useState('')
   const [events,   setEvents]   = useState(() => loadEvents())
+  const [sense,     setSense]     = useState(false)
   const [espOnline, setEspOnline] = useState(false)
   const [darkMode,  setDarkMode]  = useState(() => localStorage.getItem('gen410_dark') === '1')
   const lastSeenRef = useRef(0)
@@ -72,6 +73,7 @@ export default function App() {
           lastSeenRef.current = Date.now()
           setState(d.state ?? 0)
           setPower(d.power ?? false)
+          setSense(d.sense ?? false)
           setElapsed(d.elapsed ?? 0)
           setUptime(d.uptime ?? 0)
         } else if (topic === 'gen410/relays') {
@@ -177,6 +179,10 @@ export default function App() {
           </div>
           <div className="chip chip-upt">UPTIME<b>{fmt(uptime)}</b></div>
           <div className="chip chip-ela">IN STATE<b>{fmt(elapsed)}</b></div>
+          <div className={`chip chip-sen ${sense ? 'chip-sen-on' : 'chip-sen-off'}`}>
+            GEN OUT
+            <b className={sense ? 'text-emerald' : 'text-red'}>{sense ? 'GOOD' : 'NONE'}</b>
+          </div>
 
           {/* core */}
           <div className="core">
