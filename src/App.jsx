@@ -5,13 +5,13 @@ const BROKER  = import.meta.env.VITE_MQTT_URL  || 'wss://YOUR-CLUSTER.s1.eu.hive
 const MQUSER  = import.meta.env.VITE_MQTT_USER || ''
 const MQPASS  = import.meta.env.VITE_MQTT_PASS || ''
 
-const STATE_NAME = ['IDLE','KEY WAIT','CRANKING','VERIFYING','RUNNING','STOPPING','STOP WAIT','FAULT']
-const STATE_SUB  = ['Generator ready','Warming up','Starting engine','Checking output','Engine running','Shutting down','Cooling down','Start failed — check gen']
-const ARC_DEG    = [-90, 0, 60, 90, 150, 210, 270, 320]
-const ARC_COLOR  = ['#94a3b8','#f59e0b','#3b82f6','#8b5cf6','#10b981','#ef4444','#f97316','#dc2626']
+const STATE_NAME = ['IDLE','KEY WAIT','CRANKING','VERIFYING','RUNNING','STOPPING','STOP WAIT','FAULT','RESTARTING']
+const STATE_SUB  = ['Generator ready','Warming up','Starting engine','Checking output','Engine running','Shutting down','Cooling down','Start failed — check gen','Generator stalled — retrying']
+const ARC_DEG    = [-90, 0, 60, 90, 150, 210, 270, 320, 340]
+const ARC_COLOR  = ['#94a3b8','#f59e0b','#3b82f6','#8b5cf6','#10b981','#ef4444','#f97316','#dc2626','#f59e0b']
 
 const LOG_KEY    = 'gen410_events'
-const EVENT_LABEL = { start:'▶ Started', stop:'⏹ Stopped', fault:'⚠ Fault' }
+const EVENT_LABEL = { start:'▶ Started', stop:'⏹ Stopped', fault:'⚠ Fault', stall:'⚡ Stalled' }
 function loadEvents() { try { return JSON.parse(localStorage.getItem(LOG_KEY)) || [] } catch { return [] } }
 function saveEvents(ev) { try { localStorage.setItem(LOG_KEY, JSON.stringify(ev.slice(-500))) } catch {} }
 function fmtDur(s) { if (!s) return '—'; if (s < 60) return s+'s'; if (s < 3600) return (s/60).toFixed(1)+'m'; return (s/3600).toFixed(2)+'h' }
