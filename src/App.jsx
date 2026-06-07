@@ -149,7 +149,7 @@ export default function App() {
       {/* ── Radial HMI ─────────────────────────────────────────────────────── */}
       <main className="stage">
         <div className="hud">
-          <div className="ring r1" />
+          <div className={`ring r1 ${state === 4 ? 'glow-green' : state === 7 ? 'glow-red' : state === 8 ? 'glow-amber' : ''}`} />
           <div className="ring r2" />
 
           {/* arc needle */}

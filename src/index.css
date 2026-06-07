@@ -98,8 +98,35 @@ body {
 .ring {
   position: absolute; border-radius: 50%; border: 1.5px dashed;
 }
-.r1 { inset: 0;   border-color: rgba(37,99,235,.14); }
+.r1 { inset: 0;   border-color: rgba(37,99,235,.14); transition: box-shadow .4s, border-color .4s; }
 .r2 { inset: 17%; border-color: rgba(255,77,26,.18); }
+
+.glow-green {
+  border-color: #22c55e !important;
+  animation: pulse-green 1.8s ease-in-out infinite;
+}
+@keyframes pulse-green {
+  0%,100% { box-shadow: 0 0 10px 2px rgba(34,197,94,.35),  inset 0 0 10px 2px rgba(34,197,94,.15); }
+  50%     { box-shadow: 0 0 32px 8px rgba(34,197,94,.75),  inset 0 0 24px 6px rgba(34,197,94,.30); }
+}
+
+.glow-red {
+  border-color: #ef4444 !important;
+  animation: pulse-red-ring .9s ease-in-out infinite;
+}
+@keyframes pulse-red-ring {
+  0%,100% { box-shadow: 0 0 12px 3px rgba(239,68,68,.45),  inset 0 0 12px 3px rgba(239,68,68,.20); }
+  50%     { box-shadow: 0 0 40px 12px rgba(239,68,68,.85), inset 0 0 30px 8px rgba(239,68,68,.40); }
+}
+
+.glow-amber {
+  border-color: #f59e0b !important;
+  animation: pulse-amber 1.2s ease-in-out infinite;
+}
+@keyframes pulse-amber {
+  0%,100% { box-shadow: 0 0 10px 2px rgba(245,158,11,.35),  inset 0 0 10px 2px rgba(245,158,11,.15); }
+  50%     { box-shadow: 0 0 30px 8px rgba(245,158,11,.70),  inset 0 0 20px 6px rgba(245,158,11,.28); }
+}
 
 .arc {
   position: absolute; inset: 5.4%;
