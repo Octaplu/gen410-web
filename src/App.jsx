@@ -4,6 +4,9 @@ import mqtt from 'mqtt'
 const BROKER  = import.meta.env.VITE_MQTT_URL  || 'wss://YOUR-CLUSTER.s1.eu.hivemq.cloud:8884/mqtt'
 const MQUSER  = import.meta.env.VITE_MQTT_USER || ''
 const MQPASS  = import.meta.env.VITE_MQTT_PASS || ''
+const TG_TOKEN  = '8892720061:AAHSLtbb3Uy_Dmn2-PbHKYL3TFcOK3NDM0M'
+const TG_CHAT   = '2119949792'
+const TG_API    = `https://api.telegram.org/bot${TG_TOKEN}`
 
 const STATE_NAME = ['IDLE','KEY WAIT','CRANKING','VERIFYING','RUNNING','STOPPING','STOP WAIT','FAULT','RESTARTING']
 const STATE_SUB  = ['Generator ready','Warming up','Starting engine','Checking output','Engine running','Shutting down','Cooling down','Start failed — check gen','Generator stalled — retrying']
@@ -38,6 +41,10 @@ export default function App() {
   const [events,   setEvents]   = useState(() => loadEvents())
   const [sense,     setSense]     = useState(false)
   const [espOnline, setEspOnline] = useState(false)
+  const [splash,    setSplash]    = useState(true)
+  const [splashOut, setSplashOut] = useState(false)
+  const [contactMsg, setContactMsg] = useState('')
+  const [contactSent, setContactSent] = useState(false)
   const [darkMode,  setDarkMode]  = useState(() => localStorage.getItem('gen410_dark') === '1')
   const lastSeenRef = useRef(0)
   const clientRef   = useRef(null)
@@ -117,9 +124,37 @@ export default function App() {
   }
 
   useEffect(() => {
+    const t1 = setTimeout(() => setSplashOut(true), 2600)
+    const t2 = setTimeout(() => setSplash(false), 3100)
+    return () => { clearTimeout(t1); clearTimeout(t2) }
+  }, [])
+
+  useEffect(() => {
     document.documentElement.classList.toggle('dark', darkMode)
     localStorage.setItem('gen410_dark', darkMode ? '1' : '0')
   }, [darkMode])
+
+  const sendContact = async () => {
+    const msg = contactMsg.trim()
+    if (!msg) return
+    try {
+      const text = `🚨 <b>EMERGENCY — Gen410 Web App</b>\n\n${msg}\n\n<i>Sent from Gen410 contact form</i>`
+      const r = await fetch(`${TG_API}/sendMessage`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: TG_CHAT, text, parse_mode: 'HTML' })
+      })
+      const d = await r.json()
+      if (d.ok) {
+        await fetch(`${TG_API}/pinChatMessage`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ chat_id: TG_CHAT, message_id: d.result.message_id })
+        })
+        setContactSent(true)
+        setContactMsg('')
+        setTimeout(() => setContactSent(false), 5000)
+      }
+    } catch (err) { console.error('[Contact]', err) }
+  }
 
   const arcDeg   = ARC_DEG[state]   ?? -90
   const arcColor = ARC_COLOR[state] ?? '#94a3b8'
@@ -129,6 +164,18 @@ export default function App() {
 
   return (
     <div className="app">
+      {splash && (
+        <div className={`splash ${splashOut ? 'splash-out' : ''}`}>
+          <div className="splash-ring sr1" />
+          <div className="splash-ring sr2" />
+          <div className="splash-ring sr3" />
+          <div className="splash-content">
+            <div className="splash-logo">GEN<b>410</b></div>
+            <div className="splash-tagline">child of <b>FouNdEr</b></div>
+            <div className="splash-dots"><span /><span /><span /></div>
+          </div>
+        </div>
+      )}
       {/* ── Connection bar ─────────────────────────────────────────────────── */}
       <header className="topbar">
         <span className="brand">GEN<b>410</b></span>
@@ -282,9 +329,43 @@ export default function App() {
 
         <section className="panel-section">
           <h4 className="section-label">Relay Map</h4>
-          {[['R1','KEY — ignition key on'],['R2','START — crank motor'],['R3','STOP — engine stop'],['R4','SPARE']].map(([r,d]) => (
+          {[['R1','KEY — ignition key on'],['R2','START — crank motor'],['R3','STOP — engine stop'],['R4','ALARM — fault signal']].map(([r,d]) => (
             <div className="info-row" key={r}><span className="relay-tag">{r}</span><span>{d}</span></div>
           ))}
+        </section>
+
+        <section className="panel-section">
+          <h4 className="section-label">Contact / Emergency</h4>
+          <div className="contact-grid">
+            <a className="contact-link" href="tel:682248162">
+              <span className="contact-icon">&#128222;</span>
+              <span>682 248 162</span>
+            </a>
+            <a className="contact-link contact-email" href="mailto:Njinuwoezekiel@gmail.com">
+              <span className="contact-icon">&#9993;</span>
+              <span>Njinuwoezekiel@gmail.com</span>
+            </a>
+            <a className="contact-link contact-wa" href="https://wa.me/682248162" target="_blank" rel="noreferrer">
+              <span className="contact-icon">&#128172;</span>
+              <span>WhatsApp</span>
+            </a>
+          </div>
+          <div className="msg-field">
+            <textarea
+              className="msg-input"
+              placeholder="Type emergency message…"
+              rows={3}
+              value={contactMsg}
+              onChange={e => setContactMsg(e.target.value)}
+            />
+            <button
+              className="msg-send-btn"
+              onClick={sendContact}
+              disabled={!contactMsg.trim() || contactSent}
+            >
+              {contactSent ? '✓ Sent & Pinned on Telegram' : '🚨 Send Emergency Message'}
+            </button>
+          </div>
         </section>
       </aside>
 
