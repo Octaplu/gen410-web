@@ -4,8 +4,8 @@ import mqtt from 'mqtt'
 const BROKER  = import.meta.env.VITE_MQTT_URL  || 'wss://YOUR-CLUSTER.s1.eu.hivemq.cloud:8884/mqtt'
 const MQUSER  = import.meta.env.VITE_MQTT_USER || ''
 const MQPASS  = import.meta.env.VITE_MQTT_PASS || ''
-const TG_TOKEN  = '8892720061:AAHSLtbb3Uy_Dmn2-PbHKYL3TFcOK3NDM0M'
-const TG_CHAT   = '2119949792'
+const TG_TOKEN  = import.meta.env.VITE_TG_TOKEN || ''
+const TG_CHAT   = import.meta.env.VITE_TG_CHAT  || ''
 const TG_API    = `https://api.telegram.org/bot${TG_TOKEN}`
 
 const STATE_NAME = ['IDLE','KEY WAIT','CRANKING','VERIFYING','RUNNING','STOPPING','STOP WAIT','FAULT','RESTARTING']
