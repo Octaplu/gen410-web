@@ -2,6 +2,13 @@
   command   = "npm run build"
   publish   = "dist"
 
+[build.environment]
+  VITE_MQTT_URL  = "wss://b7bff601bf3a4f25881ddc0816df81d7.s1.eu.hivemq.cloud:8884/mqtt"
+  VITE_MQTT_USER = "gen410"
+  VITE_MQTT_PASS = "Y78t!!2C52TSNeX"
+  VITE_TG_TOKEN  = "8892720061:AAHSLtbb3Uy_Dmn2-PbHKYL3TFcOK3NDM0M"
+  VITE_TG_CHAT   = "2119949792"
+
 [[redirects]]
   from   = "/*"
   to     = "/index.html"

@@ -46,6 +46,9 @@ export default function App() {
   const [contactMsg, setContactMsg] = useState('')
   const [contactSent, setContactSent] = useState(false)
   const [darkMode,  setDarkMode]  = useState(() => localStorage.getItem('gen410_dark') === '1')
+  const [wifiConfirm, setWifiConfirm] = useState(false)
+  const [backupWifi,  setBackupWifi]  = useState([{ssid:'',pass:''},{ssid:'',pass:''}])
+  const [wifiSaveMsg, setWifiSaveMsg] = useState('')
   const lastSeenRef = useRef(0)
   const clientRef   = useRef(null)
 
@@ -133,6 +136,22 @@ export default function App() {
     document.documentElement.classList.toggle('dark', darkMode)
     localStorage.setItem('gen410_dark', darkMode ? '1' : '0')
   }, [darkMode])
+
+  const APP_URL = 'https://aquamarine-longma-ebc1a0.netlify.app'
+
+  const triggerWifiPortal = () => {
+    clientRef.current?.publish('gen410/cmd/portal', '{}')
+    setWifiConfirm(false)
+  }
+
+  const saveBackupWifi = (slot) => {
+    const b = backupWifi[slot - 1]
+    if (!b.ssid.trim()) return
+    clientRef.current?.publish('gen410/cmd/addwifi',
+      JSON.stringify({ slot, ssid: b.ssid.trim(), pass: b.pass }))
+    setWifiSaveMsg(`Slot ${slot} saved`)
+    setTimeout(() => setWifiSaveMsg(''), 3000)
+  }
 
   const sendContact = async () => {
     const msg = contactMsg.trim()
@@ -324,6 +343,47 @@ export default function App() {
                 )
               })()}
             </>
+          }
+        </section>
+
+        <section className="panel-section">
+          <h4 className="section-label">Device</h4>
+          <div className="qr-wrap">
+            <img
+              className="qr-img"
+              src={`https://api.qrserver.com/v1/create-qr-code/?size=140x140&color=f1f5f9&bgcolor=1e293b&data=${encodeURIComponent(APP_URL)}`}
+              alt="App QR code"
+            />
+            <div className="qr-info">
+              <p className="qr-label">Scan to open dashboard</p>
+              <a className="qr-link" href={APP_URL} target="_blank" rel="noreferrer">{APP_URL.replace('https://','')}</a>
+            </div>
+          </div>
+          <div className="backup-wifi-section">
+            <p className="qr-label" style={{marginBottom:8}}>Backup WiFi Networks</p>
+            {[1,2].map(slot => (
+              <div key={slot} className="backup-slot">
+                <span className="backup-slot-label">Slot {slot}</span>
+                <input className="backup-input" placeholder="SSID" value={backupWifi[slot-1].ssid}
+                  onChange={e => setBackupWifi(w => w.map((x,i) => i===slot-1 ? {...x,ssid:e.target.value} : x))} />
+                <input className="backup-input" placeholder="Password" type="password" value={backupWifi[slot-1].pass}
+                  onChange={e => setBackupWifi(w => w.map((x,i) => i===slot-1 ? {...x,pass:e.target.value} : x))} />
+                <button className="backup-save-btn" onClick={() => saveBackupWifi(slot)}
+                  disabled={!backupWifi[slot-1].ssid.trim()}>Save</button>
+              </div>
+            ))}
+            {wifiSaveMsg && <p className="save-msg">{wifiSaveMsg}</p>}
+          </div>
+
+          {!wifiConfirm
+            ? <button className="wifi-btn" onClick={() => setWifiConfirm(true)}>📶 Reconfigure WiFi</button>
+            : <div className="wifi-confirm">
+                <p>ESP32 will <b>restart</b> and open the <b>Gen410-Setup</b> WiFi portal. Continue?</p>
+                <div className="wifi-confirm-row">
+                  <button className="wifi-btn wifi-btn-danger" onClick={triggerWifiPortal}>Yes, restart</button>
+                  <button className="wifi-btn wifi-btn-cancel" onClick={() => setWifiConfirm(false)}>Cancel</button>
+                </div>
+              </div>
           }
         </section>
 
