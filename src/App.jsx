@@ -189,6 +189,7 @@ export default function App() {
           <div className="splash-ring sr2" />
           <div className="splash-ring sr3" />
           <div className="splash-content">
+            <img src="/logo.svg" className="splash-icon" alt="GEN410 logo" />
             <div className="splash-logo">GEN<b>410</b></div>
             <div className="splash-tagline">child of <b>FouNdEr</b></div>
             <div className="splash-dots"><span /><span /><span /></div>

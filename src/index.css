@@ -390,6 +390,13 @@ body {
   position: relative; z-index: 1;
   display: flex; flex-direction: column; align-items: center; gap: 10px;
 }
+.splash-icon {
+  width: clamp(80px, 22vmin, 140px);
+  height: auto;
+  filter: invert(1) drop-shadow(0 0 18px rgba(59,130,246,.7));
+  animation: s-spin 12s linear infinite;
+  margin-bottom: 4px;
+}
 .splash-logo {
   font-size: clamp(52px,15vmin,96px);
   font-weight: 200; letter-spacing: .14em; color: #e2e8f0;

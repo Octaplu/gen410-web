@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 188" fill="none" stroke="#1a1a1a" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Outer triangle -->
+  <line x1="100" y1="5"   x2="5"   y2="183" stroke-width="2.8"/>
+  <line x1="100" y1="5"   x2="195" y2="183" stroke-width="2.8"/>
+  <line x1="5"   y1="183" x2="195" y2="183" stroke-width="2.8"/>
+  <!-- Apex → inner bottom vertices -->
+  <line x1="100" y1="5"   x2="62"  y2="128" stroke-width="1.6"/>
+  <line x1="100" y1="5"   x2="138" y2="128" stroke-width="1.6"/>
+  <!-- Outer BL → inner top + inner BR -->
+  <line x1="5"   y1="183" x2="100" y2="55"  stroke-width="1.6"/>
+  <line x1="5"   y1="183" x2="138" y2="128" stroke-width="1.6"/>
+  <!-- Outer BR → inner top + inner BL -->
+  <line x1="195" y1="183" x2="100" y2="55"  stroke-width="1.6"/>
+  <line x1="195" y1="183" x2="62"  y2="128" stroke-width="1.6"/>
+  <!-- Inner triangle -->
+  <line x1="100" y1="55"  x2="62"  y2="128" stroke-width="1.6"/>
+  <line x1="100" y1="55"  x2="138" y2="128" stroke-width="1.6"/>
+  <line x1="62"  y1="128" x2="138" y2="128" stroke-width="1.6"/>
+</svg>
