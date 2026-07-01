@@ -197,7 +197,10 @@ export default function App() {
       )}
       {/* ── Connection bar ─────────────────────────────────────────────────── */}
       <header className="topbar">
-        <span className="brand">GEN<b>410</b></span>
+        <div className="brand-wrap">
+          <span className="brand">GEN<b>410</b></span>
+          <span className="brand-sub">child of <b>FouNdEr</b></span>
+        </div>
         <div className="conn-pill">
           <span className={`dot-live ${connDot}`} />
           <span>{connLabel}</span>
