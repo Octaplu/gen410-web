@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import mqtt from 'mqtt'
+import Maintenance, { getOverdueCount } from './Maintenance'
 
 const BROKER  = import.meta.env.VITE_MQTT_URL  || 'wss://YOUR-CLUSTER.s1.eu.hivemq.cloud:8884/mqtt'
 const MQUSER  = import.meta.env.VITE_MQTT_USER || ''
@@ -49,6 +50,8 @@ export default function App() {
   const [wifiConfirm, setWifiConfirm] = useState(false)
   const [backupWifi,  setBackupWifi]  = useState([{ssid:'',pass:''},{ssid:'',pass:''}])
   const [wifiSaveMsg, setWifiSaveMsg] = useState('')
+  const [page,        setPage]        = useState('dashboard')
+  const [maintAlerts, setMaintAlerts] = useState(0)
   const lastSeenRef = useRef(0)
   const clientRef   = useRef(null)
 
@@ -133,6 +136,13 @@ export default function App() {
   }, [])
 
   useEffect(() => {
+    const check = () => setMaintAlerts(getOverdueCount())
+    check()
+    const iv = setInterval(check, 60000)
+    return () => clearInterval(iv)
+  }, [])
+
+  useEffect(() => {
     document.documentElement.classList.toggle('dark', darkMode)
     localStorage.setItem('gen410_dark', darkMode ? '1' : '0')
   }, [darkMode])
@@ -210,14 +220,28 @@ export default function App() {
           <span className={`dot-live ${espOnline ? 'bg-emerald-400' : 'bg-red-400'}`} />
           <span>ESP32 {espOnline ? 'ON' : 'OFF'}</span>
         </div>
+        <button className="maint-nav-btn" onClick={() => setPage(p => p === 'maintenance' ? 'dashboard' : 'maintenance')} title="Maintenance">
+          🔧{maintAlerts > 0 && <span className="alert-badge">{maintAlerts}</span>}
+        </button>
         <button className="dark-btn" onClick={() => setDarkMode(d => !d)} title="Toggle dark mode">
           {darkMode ? '☀️' : '🌙'}
         </button>
         <button className="cog-btn" onClick={() => setPanel(p => !p)} title="Settings">⚙</button>
       </header>
 
+      {/* ── Page nav ──────────────────────────────────────────────────────── */}
+      <nav className="page-nav">
+        <button className={`page-tab ${page === 'dashboard'   ? 'page-tab-on' : ''}`} onClick={() => setPage('dashboard')}>⚡ Dashboard</button>
+        <button className={`page-tab ${page === 'maintenance' ? 'page-tab-on' : ''}`} onClick={() => setPage('maintenance')}>
+          🔧 Maintenance {maintAlerts > 0 && <span className="nav-badge">{maintAlerts}</span>}
+        </button>
+      </nav>
+
+      {/* ── Maintenance page ──────────────────────────────────────────────── */}
+      {page === 'maintenance' && <Maintenance events={events} />}
+
       {/* ── Radial HMI ─────────────────────────────────────────────────────── */}
-      <main className="stage">
+      <main className="stage" style={{ display: page === 'maintenance' ? 'none' : undefined }}>
         <div className="hud">
           <div className={`ring r1 ${state === 4 ? 'glow-green' : state === 7 ? 'glow-red' : state === 8 ? 'glow-amber' : ''}`} />
           <div className="ring r2" />
