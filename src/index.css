@@ -72,14 +72,14 @@ body {
 .esp-online { border-color: #bbf7d0; }
 .esp-offline { border-color: #fecaca; }
 .dot-live {
-  width: 8px; height: 8px; border-radius: 2px; display: inline-block;
+  width: 8px; height: 8px; border-radius: 50%; display: inline-block;
 }
 .bg-emerald-400 { background: #34d399; }
 .bg-amber-400   { background: #fbbf24; }
 .bg-red-400     { background: #f87171; }
 
 .cog-btn, .dark-btn {
-  width: 36px; height: 36px; border-radius: 4px;
+  width: 36px; height: 36px; border-radius: 50%;
   border: 1.5px solid var(--card-bdr); background: var(--bar-bg);
   font-size: 16px; cursor: pointer; color: var(--sub);
   transition: all .2s;
@@ -189,7 +189,7 @@ body {
 .rbtn {
   position: absolute;
   width: 14.6%; aspect-ratio: 76/62;
-  background: var(--core-bg); border-radius: 6px;
+  background: var(--core-bg); border-radius: 4px;
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
   cursor: pointer; transition: all .2s;
@@ -444,7 +444,7 @@ body {
 .msg-input:focus { border-color: #dc2626; }
 .msg-send-btn {
   padding: 11px; font-size: 11px; font-weight: 700; letter-spacing: .04em;
-  background: #dc2626; color: white; border: none; border-radius: 8px;
+  background: #dc2626; color: white; border: none; border-radius: 4px;
   cursor: pointer; transition: opacity .2s, background .3s;
 }
 .msg-send-btn:not(:disabled):hover { opacity: .87; }
@@ -471,19 +471,20 @@ body {
 .page-tab-on     { color: #2563eb !important; border-bottom-color: #2563eb !important; }
 .nav-badge {
   background: #dc2626; color: #fff; font-size: 10px; font-weight: 800;
-  padding: 1px 6px; border-radius: 4px; min-width: 18px; text-align: center;
+  padding: 2px 6px; border-radius: 4px; min-width: 18px; text-align: center;
 }
 
 /* ── Topbar maintenance button + badge ───────────────────────────────────── */
 .maint-nav-btn {
-  position: relative; background: none; border: none; font-size: 18px;
+  position: relative; background: none; border: none; font-size: 18px; color: var(--text);
   cursor: pointer; padding: 4px 6px; border-radius: 4px; transition: background .2s;
+  display: flex; align-items: center; justify-content: center;
 }
 .maint-nav-btn:hover { background: var(--chip-bg); }
 .alert-badge {
-  position: absolute; top: -2px; right: -4px;
+  position: absolute; top: -4px; right: -6px;
   background: #dc2626; color: #fff; font-size: 9px; font-weight: 800;
-  padding: 1px 5px; border-radius: 4px; min-width: 16px; text-align: center;
+  padding: 2px 5px; border-radius: 4px; min-width: 16px; text-align: center;
 }
 
 /* ── Maintenance page wrapper ────────────────────────────────────────────── */
@@ -498,8 +499,9 @@ body {
   margin-bottom: 20px;
 }
 .mcard {
-  border-radius: 6px; padding: 16px; text-align: center;
+  border-radius: 4px; padding: 16px; text-align: center;
   border: 1px solid var(--card-bdr); background: var(--card-bg);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 .mc-val   { font-size: 26px; font-weight: 800; margin-bottom: 4px; }
 .mc-lbl   { font-size: 11px; color: var(--sub); font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
@@ -516,6 +518,7 @@ body {
   flex: 1; padding: 9px 14px; border-radius: 4px; font-size: 13px; font-weight: 600;
   background: var(--card-bg); border: 1px solid var(--card-bdr);
   color: var(--sub); cursor: pointer; transition: all .2s;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
 }
 .mit:hover  { border-color: #2563eb; color: var(--text); }
 .mit-on     { background: #2563eb; border-color: #2563eb; color: #fff; }
@@ -523,18 +526,19 @@ body {
 /* ── Baseline banner ─────────────────────────────────────────────────────── */
 .baseline-banner {
   background: rgba(251,191,36,.1); border: 1px solid rgba(251,191,36,.4);
-  border-radius: 6px; padding: 14px 16px; margin-bottom: 16px;
+  border-radius: 4px; padding: 14px 16px; margin-bottom: 16px;
 }
 .baseline-banner p { font-size: 13px; color: var(--text); margin: 0 0 10px; }
 .baseline-btn {
   background: #d97706; color: #fff; border: none; border-radius: 4px;
   padding: 8px 18px; font-size: 12px; font-weight: 700; cursor: pointer;
+  display: flex; align-items: center; gap: 6px;
 }
 .baseline-btn:hover { background: #b45309; }
 
 /* ── Category accordion ──────────────────────────────────────────────────── */
 .sched-wrap { display: flex; flex-direction: column; gap: 8px; }
-.mcat { border-radius: 6px; overflow: hidden; border: 1px solid var(--card-bdr); }
+.mcat { border-radius: 4px; overflow: hidden; border: 1px solid var(--card-bdr); }
 .mcat-hd {
   width: 100%; display: flex; align-items: center; justify-content: space-between;
   padding: 12px 16px; font-size: 13px; font-weight: 700; letter-spacing: .04em;
@@ -546,7 +550,7 @@ body {
 .dark .mcat-hd-ok { background: rgba(74,222,128,.07); }
 .mcat-title  { font-size: 14px; }
 .mcat-badges { display: flex; align-items: center; gap: 6px; }
-.mbdg        { font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 4px; }
+.mbdg        { font-size: 10px; font-weight: 800; padding: 3px 6px; border-radius: 4px; }
 .mbdg-red    { background: #dc2626; color: #fff; }
 .mbdg-amb    { background: #d97706; color: #fff; }
 .mbdg-ok     { background: #16a34a; color: #fff; }
@@ -569,7 +573,7 @@ body {
 .mtask-dates{ font-size: 11px; color: var(--sub); display: flex; gap: 16px; flex-wrap: wrap; }
 .never      { color: #f87171; font-weight: 700; }
 .mtask-right{ display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
-.mst        { font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 4px; white-space: nowrap; }
+.mst        { font-size: 10px; font-weight: 800; padding: 3px 6px; border-radius: 4px; white-space: nowrap; }
 .mst-overdue{ background: rgba(220,38,38,.15);  color: #f87171; border: 1px solid #dc2626; }
 .mst-due    { background: rgba(217,119,6,.15);  color: #fbbf24; border: 1px solid #d97706; }
 .mst-ok     { background: rgba(22,163,74,.12);  color: #4ade80; border: 1px solid #16a34a; }
@@ -583,15 +587,15 @@ body {
 /* ── Spare parts box ─────────────────────────────────────────────────────── */
 .spare-parts-box {
   margin-top: 20px; background: var(--card-bg); border: 1px solid var(--card-bdr);
-  border-radius: 10px; padding: 16px 20px;
+  border-radius: 4px; padding: 16px 20px;
 }
-.spare-parts-box h3 { font-size: 14px; font-weight: 700; margin: 0 0 12px; color: var(--text); }
+.spare-parts-box h3 { font-size: 14px; font-weight: 700; margin: 0 0 12px; color: var(--text); display: flex; align-items: center; gap: 6px; }
 .spare-parts-box ul { margin: 0; padding-left: 20px; }
 .spare-parts-box li { font-size: 13px; color: var(--text); margin-bottom: 5px; line-height: 1.4; }
 
 /* ── Run log table ───────────────────────────────────────────────────────── */
 .runlog-wrap { display: flex; flex-direction: column; gap: 12px; }
-.rlog-table-scroll { overflow-x: auto; border-radius: 10px; border: 1px solid var(--card-bdr); }
+.rlog-table-scroll { overflow-x: auto; border-radius: 4px; border: 1px solid var(--card-bdr); }
 .rlog-table {
   width: 100%; border-collapse: collapse; font-size: 12px; min-width: 640px;
   background: var(--card-bg);
@@ -607,7 +611,7 @@ body {
 .rlog-table tr:hover td { background: var(--chip-bg); }
 .rrow-n  { color: var(--sub); font-size: 11px; }
 .dim     { color: var(--sub); }
-.rtag    { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; white-space: nowrap; }
+.rtag    { font-size: 10px; font-weight: 700; padding: 3px 6px; border-radius: 4px; white-space: nowrap; }
 .rtag-stop  { background: rgba(74,222,128,.15); color: #4ade80; }
 .rtag-fault { background: rgba(248,113,113,.15); color: #f87171; }
 .rtag-stall { background: rgba(251,191,36,.15);  color: #fbbf24; }
@@ -615,7 +619,7 @@ body {
 .rlog-summary {
   display: flex; flex-wrap: wrap; gap: 8px;
   background: var(--card-bg); border: 1px solid var(--card-bdr);
-  border-radius: 10px; padding: 12px 16px;
+  border-radius: 4px; padding: 12px 16px;
 }
 .rsum { display: flex; flex-direction: column; flex: 1; min-width: 100px; }
 .rsum span { font-size: 10px; color: var(--sub); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 2px; }
@@ -623,11 +627,11 @@ body {
 
 .rlog-note {
   font-size: 11px; color: var(--sub); line-height: 1.5;
-  background: var(--chip-bg); border-radius: 8px; padding: 10px 14px;
+  background: var(--chip-bg); border-radius: 4px; padding: 10px 14px;
 }
 .no-log {
   padding: 40px 20px; text-align: center; color: var(--sub);
-  background: var(--card-bg); border: 1px solid var(--card-bdr); border-radius: 10px;
+  background: var(--card-bg); border: 1px solid var(--card-bdr); border-radius: 4px;
 }
 
 /* ── Responsive tweaks ───────────────────────────────────────────────────── */

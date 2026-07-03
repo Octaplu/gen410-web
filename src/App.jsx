@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import mqtt from 'mqtt'
+import { Activity, Wrench, Sun, Moon, Settings, Wifi, Phone, Mail, MessageCircle } from 'lucide-react'
 import Maintenance, { getOverdueCount } from './Maintenance'
 
 const BROKER  = import.meta.env.VITE_MQTT_URL  || 'wss://YOUR-CLUSTER.s1.eu.hivemq.cloud:8884/mqtt'
@@ -221,19 +222,24 @@ export default function App() {
           <span>ESP32 {espOnline ? 'ON' : 'OFF'}</span>
         </div>
         <button className="maint-nav-btn" onClick={() => setPage(p => p === 'maintenance' ? 'dashboard' : 'maintenance')} title="Maintenance">
-          🔧{maintAlerts > 0 && <span className="alert-badge">{maintAlerts}</span>}
+          <Wrench size={18} />
+          {maintAlerts > 0 && <span className="alert-badge">{maintAlerts}</span>}
         </button>
         <button className="dark-btn" onClick={() => setDarkMode(d => !d)} title="Toggle dark mode">
-          {darkMode ? '☀️' : '🌙'}
+          {darkMode ? <Sun size={18} /> : <Moon size={18} />}
         </button>
-        <button className="cog-btn" onClick={() => setPanel(p => !p)} title="Settings">⚙</button>
+        <button className="cog-btn" onClick={() => setPanel(p => !p)} title="Settings">
+          <Settings size={18} />
+        </button>
       </header>
 
       {/* ── Page nav ──────────────────────────────────────────────────────── */}
       <nav className="page-nav">
-        <button className={`page-tab ${page === 'dashboard'   ? 'page-tab-on' : ''}`} onClick={() => setPage('dashboard')}>⚡ Dashboard</button>
+        <button className={`page-tab ${page === 'dashboard'   ? 'page-tab-on' : ''}`} onClick={() => setPage('dashboard')}>
+          <Activity size={16} /> Dashboard
+        </button>
         <button className={`page-tab ${page === 'maintenance' ? 'page-tab-on' : ''}`} onClick={() => setPage('maintenance')}>
-          🔧 Maintenance {maintAlerts > 0 && <span className="nav-badge">{maintAlerts}</span>}
+          <Wrench size={16} /> Maintenance {maintAlerts > 0 && <span className="nav-badge">{maintAlerts}</span>}
         </button>
       </nav>
 
@@ -404,7 +410,7 @@ export default function App() {
           </div>
 
           {!wifiConfirm
-            ? <button className="wifi-btn" onClick={() => setWifiConfirm(true)}>📶 Reconfigure WiFi</button>
+            ? <button className="wifi-btn" onClick={() => setWifiConfirm(true)}><Wifi size={16} /> Reconfigure WiFi</button>
             : <div className="wifi-confirm">
                 <p>ESP32 will <b>restart</b> and open the <b>Gen410-Setup</b> WiFi portal. Continue?</p>
                 <div className="wifi-confirm-row">
@@ -426,15 +432,15 @@ export default function App() {
           <h4 className="section-label">Contact / Emergency</h4>
           <div className="contact-grid">
             <a className="contact-link" href="tel:682248162">
-              <span className="contact-icon">&#128222;</span>
+              <span className="contact-icon"><Phone size={16} /></span>
               <span>682 248 162</span>
             </a>
             <a className="contact-link contact-email" href="mailto:Njinuwoezekiel@gmail.com">
-              <span className="contact-icon">&#9993;</span>
+              <span className="contact-icon"><Mail size={16} /></span>
               <span>Njinuwoezekiel@gmail.com</span>
             </a>
             <a className="contact-link contact-wa" href="https://wa.me/682248162" target="_blank" rel="noreferrer">
-              <span className="contact-icon">&#128172;</span>
+              <span className="contact-icon"><MessageCircle size={16} /></span>
               <span>WhatsApp</span>
             </a>
           </div>
@@ -451,7 +457,7 @@ export default function App() {
               onClick={sendContact}
               disabled={!contactMsg.trim() || contactSent}
             >
-              {contactSent ? '✓ Sent & Pinned on Telegram' : '🚨 Send Emergency Message'}
+              {contactSent ? '✓ Sent & Pinned on Telegram' : 'Send Emergency Message'}
             </button>
           </div>
         </section>

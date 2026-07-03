@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react'
+import { ClipboardList, BarChart2, Check, ChevronDown, ChevronUp, Settings2 } from 'lucide-react'
 
 // ── Maintenance tasks — 410 kVA, 12+ years, known faults: battery contact + overheating ──
 const TASKS = [
@@ -19,8 +20,8 @@ const TASKS = [
   { id:'w5', cat:'Weekly', pri:'med',  label:'Drive belts (alternator/fan) — check tension and cracking' },
 
   // Monthly
-  { id:'m1', cat:'Monthly', pri:'crit', label:'⚠ PRIORITY: Remove & clean battery terminals — wire brush + anti-corrosion grease before refitting' },
-  { id:'m2', cat:'Monthly', pri:'crit', label:'⚠ PRIORITY: Torque battery terminal bolts to spec — loose torque is #1 no-start cause' },
+  { id:'m1', cat:'Monthly', pri:'crit', label:'PRIORITY: Remove & clean battery terminals — wire brush + anti-corrosion grease before refitting' },
+  { id:'m2', cat:'Monthly', pri:'crit', label:'PRIORITY: Torque battery terminal bolts to spec — loose torque is #1 no-start cause' },
   { id:'m3', cat:'Monthly', pri:'crit', label:'Battery load-test — many faults show good resting voltage but fail under crank load' },
   { id:'m4', cat:'Monthly', pri:'crit', label:'Inspect & clean earth/ground strap (engine block → chassis) — corroded ground mimics battery fault' },
   { id:'m5', cat:'Monthly', pri:'high', label:'Battery charger/trickle charger output check while set is idle' },
@@ -40,8 +41,8 @@ const TASKS = [
   { id:'q7', cat:'Quarterly / 250 h', pri:'med',  label:'Turbocharger — play, oil leaks, boost pressure check' },
 
   // Semi-Annual / 500 h
-  { id:'s1', cat:'Semi-Annual / 500 h', pri:'crit', label:'⚠ Full coolant flush and refill — scale buildup inside block/radiator is most common overheating cause in old units' },
-  { id:'s2', cat:'Semi-Annual / 500 h', pri:'crit', label:'⚠ Replace thermostat preventively — stuck-closed = classic overheating cause; cheap part, high impact' },
+  { id:'s1', cat:'Semi-Annual / 500 h', pri:'crit', label:'Full coolant flush and refill — scale buildup inside block/radiator is most common overheating cause in old units' },
+  { id:'s2', cat:'Semi-Annual / 500 h', pri:'crit', label:'Replace thermostat preventively — stuck-closed = classic overheating cause; cheap part, high impact' },
   { id:'s3', cat:'Semi-Annual / 500 h', pri:'high', label:'Water pump — inspect for leaks and bearing play' },
   { id:'s4', cat:'Semi-Annual / 500 h', pri:'high', label:'Radiator mounting rubbers/isolators — cracked mounts cause vibration that loosens battery and electrical terminals' },
   { id:'s5', cat:'Semi-Annual / 500 h', pri:'high', label:'Wiring harness insulation — check for cracking/chafing, especially near heat sources' },
@@ -52,7 +53,7 @@ const TASKS = [
   { id:'a1', cat:'Annual / 1000 h', pri:'crit', label:'Full injector service/calibration — poor combustion → overheating + power loss' },
   { id:'a2', cat:'Annual / 1000 h', pri:'crit', label:'Valve clearance check and adjustment' },
   { id:'a3', cat:'Annual / 1000 h', pri:'crit', label:'Full cooling system: flush, new coolant, replace all hoses if >2 years old, pressure test' },
-  { id:'a4', cat:'Annual / 1000 h', pri:'crit', label:'⚠ Replace battery if >3 years old — do regardless of test result given this unit\'s fault history' },
+  { id:'a4', cat:'Annual / 1000 h', pri:'crit', label:'Replace battery if >3 years old — do regardless of test result given this unit\'s fault history' },
   { id:'a5', cat:'Annual / 1000 h', pri:'crit', label:'Replace battery cables if insulation is cracked — corrosion often travels inside the cable' },
   { id:'a6', cat:'Annual / 1000 h', pri:'high', label:'Alternator brushes and bearings inspection' },
   { id:'a7', cat:'Annual / 1000 h', pri:'high', label:'Full electrical panel — tighten ALL lugs and terminals (12 years of thermal cycling loosens everything)' },
@@ -162,8 +163,12 @@ export default function Maintenance({ events }) {
 
       {/* ── Inner tabs ────────────────────────────────────────────────────── */}
       <div className="maint-tabs-inner">
-        <button className={`mit ${tab === 'schedule' ? 'mit-on' : ''}`} onClick={() => setTab('schedule')}>📋 Maintenance Schedule</button>
-        <button className={`mit ${tab === 'log'      ? 'mit-on' : ''}`} onClick={() => setTab('log')}>📊 Run &amp; Fault History</button>
+        <button className={`mit ${tab === 'schedule' ? 'mit-on' : ''}`} onClick={() => setTab('schedule')}>
+          <ClipboardList size={16} /> Maintenance Schedule
+        </button>
+        <button className={`mit ${tab === 'log'      ? 'mit-on' : ''}`} onClick={() => setTab('log')}>
+          <BarChart2 size={16} /> Run &amp; Fault History
+        </button>
       </div>
 
       {/* ── Maintenance Schedule ──────────────────────────────────────────── */}
@@ -172,7 +177,9 @@ export default function Maintenance({ events }) {
           {Object.values(done).length === 0 && !baselined && (
             <div className="baseline-banner">
               <p>First time here? All tasks show as <b>overdue</b> until marked done. If maintenance is already up to date, click below to set today as baseline.</p>
-              <button className="baseline-btn" onClick={baselineAll}>✓ Set Today as Maintenance Baseline</button>
+              <button className="baseline-btn" onClick={baselineAll}>
+                <Check size={16} /> Set Today as Maintenance Baseline
+              </button>
             </div>
           )}
 
@@ -192,8 +199,8 @@ export default function Maintenance({ events }) {
                   <div className="mcat-badges">
                     {catOverdue > 0 && <span className="mbdg mbdg-red">{catOverdue} OVERDUE</span>}
                     {catDue  > 0 && <span className="mbdg mbdg-amb">{catDue} DUE SOON</span>}
-                    {catOverdue === 0 && catDue === 0 && <span className="mbdg mbdg-ok">ALL OK ✓</span>}
-                    <span className="chevron">{isOpen ? '▲' : '▼'}</span>
+                    {catOverdue === 0 && catDue === 0 && <span className="mbdg mbdg-ok">ALL OK</span>}
+                    <span className="chevron">{isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}</span>
                   </div>
                 </button>
 
@@ -216,7 +223,7 @@ export default function Maintenance({ events }) {
                           </div>
                           <div className="mtask-right">
                             <span className={`mst mst-${status}`}>{status === 'overdue' ? 'OVERDUE' : status === 'due' ? 'DUE SOON' : 'OK'}</span>
-                            <button className="mdone-btn" onClick={() => markDone(task.id)}>✓ Done</button>
+                            <button className="mdone-btn" onClick={() => markDone(task.id)}>Done</button>
                           </div>
                         </div>
                       )
@@ -228,7 +235,7 @@ export default function Maintenance({ events }) {
           })}
 
           <div className="spare-parts-box">
-            <h3>🔧 Recommended Spare Parts (On-Site)</h3>
+            <h3><Settings2 size={18} /> Recommended Spare Parts (On-Site)</h3>
             <ul>
               <li>1 spare battery (matched to existing spec)</li>
               <li>Battery terminals, clamps, dielectric grease, anti-corrosion compound</li>
